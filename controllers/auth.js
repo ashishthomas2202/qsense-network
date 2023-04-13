@@ -1,16 +1,24 @@
 const { User, validateUser } = require("../models/User");
 
 exports.signup = async function (req, res) {
-  console.log("Signup controller", req.body);
-
   const result = await validateUser(req.body);
 
   if (result.err) {
     res.status(400).json({ error: result.err, message: result.message });
   } else {
+    let firstName = req.body.firstName;
+    firstName =
+      firstName[0].toUpperCase() +
+      (firstName.substring(1) ? firstName.substring(1).toLowerCase() : "");
+
+    let lastName = req.body.lastName;
+    lastName =
+      lastName[0].toUpperCase() +
+      (lastName.substring(1) ? lastName.substring(1).toLowerCase() : "");
+
     let user = new User({
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
+      firstName: firstName,
+      lastName: lastName,
       email: req.body.email,
       password: req.body.password,
     });
@@ -32,3 +40,5 @@ exports.signup = async function (req, res) {
       });
   }
 };
+
+exports.signin = function (req, res) {};
