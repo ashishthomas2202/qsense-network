@@ -3,11 +3,15 @@ const mongoose = require("mongoose");
 const app = express();
 require("dotenv").config();
 
+const authRoute = require("./routes/auth");
+
 const Port = process.env.PORT || 3000;
 
 //connect mongodb
 mongoose
-  .connect(process.env.MONGO_URL, { useNewUrlParser: true })
+  .connect(process.env.MONGO_URL, {
+    useNewUrlParser: true,
+  })
   .then(() => {
     console.log("DB Connected");
   })
@@ -18,6 +22,9 @@ mongoose
 //middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+//routes
+app.use("/api/auth", authRoute);
 
 //Start Server
 app.listen(Port, () => {

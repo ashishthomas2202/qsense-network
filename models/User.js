@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
-const Account = require("./Account");
+const uniqueValidator = require("mongoose-unique-validator");
+const yup = require("yup");
+
 //User Schema
 
 const userSchema = new mongoose.Schema(
@@ -19,9 +21,8 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       required: true,
+      unique: true,
     },
-    account: Account.Schema,
-
     // salt: {
     //   type: String,
     //   required: true,
@@ -30,6 +31,45 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const User = new mongoose.model("User", userSchema);
+userSchema
+  .virtual("password")
+  .set((password) => {
+    this._password = password;
+  })
+  .get(() => {
+    return this._password;
+  });
 
-module.exports = User;
+const validateUser = (user) => {
+  const schema = yup.object().shape({
+    firstName: yup.string().required("First Name is required.").min(1).max(50),
+    lastName: yup.string().required("Last Name is required.").min(1).max(50),
+    email: yup
+      .string()
+      .required("Email is required.")
+      .email("Email is invalid."),
+    password: yup
+      .string()
+      .required("Password is required")
+      .min(8, "Password must be atleast 8 characters long")
+      .matches(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*]).{8,}$/,
+        "Password must contain atleast an uppercase character,a lowercase character,a number and a special character"
+      ),
+  });
+
+  return schema
+    .validate(user)
+    .then((user) => user)
+    .catch((err) => {
+      console.log("yup error:", err);
+
+      return { err, message: err.message };
+    });
+};
+
+userSchema.plugin(uniqueValidator);
+
+exports.User = new mongoose.model("User", userSchema);
+
+exports.validateUser = validateUser;
