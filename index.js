@@ -15,6 +15,10 @@ mongoose
     console.log("DB Connection error:", err);
   });
 
+//middlewares
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 //Start Server
 app.listen(Port, () => {
   console.log("Server started at Port ", Port);
