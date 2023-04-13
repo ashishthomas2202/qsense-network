@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
+const crypto = require("crypto-js");
+const { v4: uuidv4 } = require("uuid");
 const yup = require("yup");
 
 //User Schema
@@ -23,22 +25,46 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    // salt: {
-    //   type: String,
-    //   required: true,
-    // },
+    hashedPassword: {
+      type: String,
+      required: true,
+    },
+    salt: {
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true }
 );
 
 userSchema
   .virtual("password")
-  .set((password) => {
+  .set(function (password) {
     this._password = password;
+    this.salt = uuidv4();
+    this.hashedPassword = this.encryptPassword(password);
   })
   .get(() => {
     return this._password;
   });
+
+userSchema.methods = {
+  authenticate: function (plainText) {
+    let password = this.encryptPassword(plainText).toString();
+    return password == this.hashedPassword;
+  },
+  encryptPassword: function (password) {
+    if (!password) {
+      return "";
+    }
+
+    try {
+      return crypto.HmacSHA256(password, this.salt);
+    } catch (err) {
+      return { err };
+    }
+  },
+};
 
 const validateUser = (user) => {
   const schema = yup.object().shape({
