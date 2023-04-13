@@ -1,4 +1,5 @@
 const { User, validateUser } = require("../models/User");
+const Account = require("../models/Account");
 
 exports.signup = async function (req, res) {
   const result = await validateUser(req.body);
@@ -26,6 +27,11 @@ exports.signup = async function (req, res) {
     user
       .save()
       .then((user) => {
+        let account = new Account({ devices: [] });
+        account.save();
+        user.accountId = account._id;
+        user.save();
+
         res.json({
           user,
         });

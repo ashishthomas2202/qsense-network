@@ -33,6 +33,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    accountId: { type: String },
   },
   { timestamps: true }
 );
