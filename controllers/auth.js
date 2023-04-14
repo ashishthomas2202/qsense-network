@@ -36,7 +36,7 @@ exports.signup = async function (req, res) {
         user.__v = undefined;
         res.json({
           user: {
-            __id: user.__id,
+            _id: user._id,
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
