@@ -33,6 +33,9 @@ exports.signup = async function (req, res) {
         user.save();
 
         user.accountId = undefined;
+        user.salt = undefined;
+        user.hashedPassword = undefined;
+        user.__v = undefined;
         res.json({
           user,
         });
