@@ -17,6 +17,7 @@
     "mongoose-unique-validator": "^4.0.0",
     "nodemon": "^2.0.22",
     "uuid": "^9.0.0",
+    "winston": "^3.8.2",
     "yup": "^1.1.0"
   }
 }

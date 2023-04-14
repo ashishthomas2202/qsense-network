@@ -37,8 +37,6 @@ exports.signup = async function (req, res) {
         });
       })
       .catch((err) => {
-        console.log("Error in creating user: ", err);
-
         res.status(502).json({
           error: err.errors,
           message: "Email address already Exists. Please try to Sign In ",
@@ -48,7 +46,6 @@ exports.signup = async function (req, res) {
 };
 
 exports.signin = function (req, res) {
-  console.log("Signin controller: ", req.body);
   const { email, password } = req.body;
 
   if (!email) {
@@ -68,8 +65,6 @@ exports.signin = function (req, res) {
   } else {
     User.findOne({ email })
       .then((user) => {
-        console.log("user found: ", user);
-
         let authorized = user.authenticate(password);
 
         if (!authorized) {
@@ -86,7 +81,6 @@ exports.signin = function (req, res) {
         }
       })
       .catch((err) => {
-        console.log("error finding user: ", err);
         res.status(502).json({
           error: err,
           message: "Invalid Email or password.",
