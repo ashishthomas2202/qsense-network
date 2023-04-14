@@ -32,6 +32,7 @@ exports.signup = async function (req, res) {
         user.accountId = account._id;
         user.save();
 
+        user.accountId = undefined;
         res.json({
           user,
         });
