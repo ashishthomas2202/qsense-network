@@ -30,17 +30,18 @@ exports.signup = async function (req, res) {
         let account = new Account({ devices: [] });
         account.save();
         user.accountId = account._id;
-        user.save();
-        user.salt = undefined;
-        user.hashedPassword = undefined;
-        user.__v = undefined;
-        res.json({
-          user: {
-            _id: user._id,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            email: user.email,
-          },
+        user.save().then((user) => {
+          user.salt = undefined;
+          user.hashedPassword = undefined;
+          user.__v = undefined;
+          res.json({
+            user: {
+              _id: user._id,
+              firstName: user.firstName,
+              lastName: user.lastName,
+              email: user.email,
+            },
+          });
         });
       })
       .catch((err) => {
