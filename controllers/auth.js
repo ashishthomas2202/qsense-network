@@ -31,13 +31,16 @@ exports.signup = async function (req, res) {
         account.save();
         user.accountId = account._id;
         user.save();
-
-        user.accountId = undefined;
         user.salt = undefined;
         user.hashedPassword = undefined;
         user.__v = undefined;
         res.json({
-          user,
+          user: {
+            __id: user.__id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+          },
         });
       })
       .catch((err) => {
