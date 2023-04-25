@@ -90,3 +90,88 @@ exports.add = function (req, res) {
       res.status(400).json({ error: err, message: "Invalid Credentials" });
     });
 };
+
+exports.update = function (req, res) {
+  const { userId, accountId, deviceId } = req.params;
+
+  User.findOne({ _id: userId })
+    .then((user) => {
+      console.log(user.accountId, accountId);
+      if (user.accountId === accountId) {
+        Account.findOne({ _id: accountId })
+          .then((account) => {
+            Device.findOne({ _id: deviceId })
+              .then((device) => {
+                const { status } = req.body;
+                device.status = status;
+
+                device
+                  .save()
+                  .then((data) => {
+                    logger.info(`device Updated: ${data}`);
+                    res.json({
+                      device: data,
+                      message: "Successfully Updated",
+                    });
+                  })
+                  .catch((err) => {
+                    res.status(400).json({
+                      error: err,
+                      message: "Status cannot be update at this moment",
+                    });
+                  });
+              })
+              .catch((err) => {
+                res
+                  .status(400)
+                  .json({ error: err, message: "Device Not Found" });
+              });
+
+            // const device = new Device({
+            //   name,
+            //   status,
+            //   value,
+            //   connected,
+            // });
+
+            // device
+            //   .save()
+            //   .then((device) => {
+            //     account.devices.push(device._id);
+            //     account
+            //       .save()
+            //       .then(() => {
+            //         res.json({
+            //           device: device,
+            //           message: "Success",
+            //         });
+            //       })
+            //       .catch((err) => {
+            //         res.status(400).json({
+            //           error: err,
+            //           message: "Cant connect the device at this moment",
+            //         });
+            //       });
+            //   })
+            //   .catch((err) => {
+            //     res.status(400).json({
+            //       error: err,
+            //       message: "Cant connect the device at this moment",
+            //     });
+            //   });
+
+            // logger.info(`add device: ${device}`);
+          })
+          .catch((err) => {
+            res
+              .status(400)
+              .json({ error: err, message: "Invalid Credentials" });
+          });
+      } else {
+        res.status(400).json({ error: {}, message: "Invalid Credentials" });
+      }
+    })
+    .catch((err) => {
+      res.status(400).json({ error: err, message: "Invalid Credentials" });
+    });
+};
