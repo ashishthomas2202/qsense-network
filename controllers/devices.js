@@ -175,3 +175,40 @@ exports.update = function (req, res) {
       res.status(400).json({ error: err, message: "Invalid Credentials" });
     });
 };
+
+exports.state = function (req, res) {
+  const { userId, accountId, deviceId } = req.params;
+
+  User.findOne({ _id: userId })
+    .then((user) => {
+      console.log(user.accountId, accountId);
+      if (user.accountId === accountId) {
+        Account.findOne({ _id: accountId })
+          .then((account) => {
+            Device.findOne({ _id: deviceId })
+              .then((device) => {
+                logger.info(`device State: ${device}`);
+                res.json({
+                  device: device,
+                  message: "Success",
+                });
+              })
+              .catch((err) => {
+                res
+                  .status(400)
+                  .json({ error: err, message: "Device Not Found" });
+              });
+          })
+          .catch((err) => {
+            res
+              .status(400)
+              .json({ error: err, message: "Invalid Credentials" });
+          });
+      } else {
+        res.status(400).json({ error: {}, message: "Invalid Credentials" });
+      }
+    })
+    .catch((err) => {
+      res.status(400).json({ error: err, message: "Invalid Credentials" });
+    });
+};
