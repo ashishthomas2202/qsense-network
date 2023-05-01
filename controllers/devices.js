@@ -176,7 +176,7 @@ exports.update = function (req, res) {
     });
 };
 
-exports.state = function (req, res) {
+exports.getState = function (req, res) {
   const { userId, accountId, deviceId } = req.params;
 
   User.findOne({ _id: userId })
@@ -192,6 +192,56 @@ exports.state = function (req, res) {
                   device: device,
                   message: "Success",
                 });
+              })
+              .catch((err) => {
+                res
+                  .status(400)
+                  .json({ error: err, message: "Device Not Found" });
+              });
+          })
+          .catch((err) => {
+            res
+              .status(400)
+              .json({ error: err, message: "Invalid Credentials" });
+          });
+      } else {
+        res.status(400).json({ error: {}, message: "Invalid Credentials" });
+      }
+    })
+    .catch((err) => {
+      res.status(400).json({ error: err, message: "Invalid Credentials" });
+    });
+};
+
+exports.updateSensor = function (req, res) {
+  const { userId, accountId, deviceId } = req.params;
+
+  User.findOne({ _id: userId })
+    .then((user) => {
+      console.log(user.accountId, accountId);
+      if (user.accountId === accountId) {
+        Account.findOne({ _id: accountId })
+          .then((account) => {
+            Device.findOne({ _id: deviceId })
+              .then((device) => {
+                const { value } = req.body;
+                device.value = value;
+
+                device
+                  .save()
+                  .then((data) => {
+                    logger.info(`Sensor Data updated : ${data}`);
+                    res.json({
+                      device: data,
+                      message: "Successfully Updated",
+                    });
+                  })
+                  .catch((err) => {
+                    res.status(400).json({
+                      error: err,
+                      message: "Status cannot be update at this moment",
+                    });
+                  });
               })
               .catch((err) => {
                 res
